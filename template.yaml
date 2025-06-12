@@ -142,6 +142,9 @@ Resources:
       DeploymentGroupName: TicTacToeLambdaDG
       ServiceRoleArn: !GetAtt CodeDeployRole.Arn
       DeploymentConfigName: CodeDeployDefault.LambdaAllAtOnce
+      DeploymentStyle:
+        DeploymentType: BLUE_GREEN
+        DeploymentOption: WITH_TRAFFIC_CONTROL
       AutoRollbackConfiguration:
         Enabled: true
         Events:

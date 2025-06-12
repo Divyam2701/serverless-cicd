@@ -5,3 +5,4 @@ Resources:
       Properties:
         Name: TicTacToeLambda
         Alias: live
+        CurrentVersion: "1"
