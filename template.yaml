@@ -48,6 +48,7 @@ Resources:
   TicTacToeLambda:
     Type: AWS::Lambda::Function
     Properties:
+      FunctionName: TicTacToeLambda
       Handler: lambda_function.lambda_handler
       Role: !GetAtt TicTacToeLambdaRole.Arn
       Runtime: python3.9
@@ -164,6 +165,13 @@ Resources:
                   - lambda:UpdateFunctionCode
                 Resource: "*"
 
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: ApiGatewayMethod
+    Properties:
+      RestApiId: !Ref ApiGatewayRestApi
+      StageName: dev
+
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -207,4 +215,4 @@ Resources:
 Outputs:
   ApiEndpoint:
     Description: "API Gateway Endpoint"
-    Value: !Sub "https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/tictactoe"
+    Value: !Sub "https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/dev/tictactoe"
