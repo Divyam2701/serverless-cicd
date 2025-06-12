@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Serverless Tic-Tac-Toe App with Lambda, API Gateway, CodeBuild, CodePipeline, and CodeDeploy
+Description: Serverless Tic-Tac-Toe App with Lambda, API Gateway, CodeBuild, and CodePipeline
 
 Parameters:
   GitHubOwner:
@@ -98,60 +98,6 @@ Resources:
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/*/POST/tictactoe"
 
-  CodeDeployApplication:
-    Type: AWS::CodeDeploy::Application
-    Properties:
-      ApplicationName: TicTacToeLambdaApp
-      ComputePlatform: Lambda
-
-  CodeDeployRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: codedeploy.amazonaws.com
-            Action: sts:AssumeRole
-      Policies:
-        - PolicyName: CodeDeployPolicy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - lambda:UpdateFunctionCode
-                  - lambda:GetFunction
-                  - lambda:ListAliases
-                  - lambda:ListVersionsByFunction
-                  - lambda:CreateAlias
-                  - lambda:UpdateAlias
-                  - lambda:GetAlias
-                  - lambda:DeleteAlias
-                  - iam:PassRole
-                  - cloudwatch:*
-                  - s3:Get*
-                  - s3:List*
-                Resource: "*"
-
-  CodeDeployDeploymentGroup:
-    Type: AWS::CodeDeploy::DeploymentGroup
-    Properties:
-      ApplicationName: !Ref CodeDeployApplication
-      DeploymentGroupName: TicTacToeLambdaDG
-      ServiceRoleArn: !GetAtt CodeDeployRole.Arn
-      DeploymentConfigName: CodeDeployDefault.LambdaAllAtOnce
-      DeploymentStyle:
-        DeploymentType: BLUE_GREEN
-        DeploymentOption: WITH_TRAFFIC_CONTROL
-      AutoRollbackConfiguration:
-        Enabled: true
-        Events:
-          - DEPLOYMENT_FAILURE
-      AlarmConfiguration:
-        Enabled: false
-
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
@@ -173,7 +119,6 @@ Resources:
                   - lambda:UpdateFunctionCode
                   - lambda:GetFunction
                   - s3:*
-                  - codedeploy:*
                 Resource: "*"
 
   CodeBuildProject:
@@ -217,7 +162,6 @@ Resources:
                   - iam:PassRole
                   - lambda:GetFunction
                   - lambda:UpdateFunctionCode
-                  - codedeploy:*
                 Resource: "*"
 
   Pipeline:
@@ -258,20 +202,6 @@ Resources:
                 - Name: BuildOutput
               Configuration:
                 ProjectName: !Ref CodeBuildProject
-              RunOrder: 1
-        - Name: Deploy
-          Actions:
-            - Name: Deploy
-              ActionTypeId:
-                Category: Deploy
-                Owner: AWS
-                Provider: CodeDeploy
-                Version: 1
-              InputArtifacts:
-                - Name: BuildOutput
-              Configuration:
-                ApplicationName: !Ref CodeDeployApplication
-                DeploymentGroupName: !Ref CodeDeployDeploymentGroup
               RunOrder: 1
 
 Outputs:

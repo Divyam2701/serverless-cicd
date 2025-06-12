@@ -8,8 +8,8 @@ phases:
     commands:
       - echo "Zipping Lambda function from source code..."
       - zip lambda_function.zip lambda_function.py
-      - echo "Build complete."
+      - echo "Updating Lambda function code directly..."
+      - aws lambda update-function-code --function-name TicTacToeLambda --zip-file fileb://lambda_function.zip
 artifacts:
   files:
     - lambda_function.zip
-    - appspec.yml
