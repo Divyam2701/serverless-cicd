@@ -1,17 +1,25 @@
 version: 0.2
 
+env:
+  variables:
+    WEBSITE_BUCKET: website-python-bucket  # 🔁 Replace with your actual S3 bucket name or set via CodeBuild console
+
 phases:
   install:
     runtime-versions:
       python: 3.9
+
   build:
     commands:
       - echo "Zipping Lambda function from source code..."
       - zip lambda_function.zip lambda_function.py
+
       - echo "Updating Lambda function code directly..."
       - aws lambda update-function-code --function-name TicTacToeLambda --zip-file fileb://lambda_function.zip
-      - echo "Uploading index.html to S3 bucket:$WEBSITE_BUCKET"
+
+      - echo "Uploading index.html to S3 bucket: $WEBSITE_BUCKET"
       - aws s3 cp index.html s3://$WEBSITE_BUCKET/index.html
+
 artifacts:
   files:
     - lambda_function.zip
