@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    WEBSITE_BUCKET: tictactoe-website-bucket  # Must match BucketName in infra-pipeline.yml
+    WEBSITE_BUCKET: website-python-27  # This must match the BucketName in infra-pipeline.yml
 
 phases:
   install:
