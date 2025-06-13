@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    WEBSITE_BUCKET: website-python-27  # <-- replace this with your actual bucket name
+    WEBSITE_BUCKET: tictactoe-website-bucket  # Must match BucketName in infra-pipeline.yml
 
 phases:
   install:
@@ -15,7 +15,7 @@ phases:
       - zip lambda_function.zip lambda_function.py
       - echo Updating Lambda function code directly...
       - aws lambda update-function-code --function-name TicTacToeLambda --zip-file fileb://lambda_function.zip
-      - echo Uploading index.html to S3 bucket: $WEBSITE_BUCKET
+      - test -n "$WEBSITE_BUCKET"
       - aws s3 cp index.html s3://$WEBSITE_BUCKET/index.html
 
 artifacts:
