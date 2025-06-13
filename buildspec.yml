@@ -10,6 +10,9 @@ phases:
       - zip lambda_function.zip lambda_function.py
       - echo "Updating Lambda function code directly..."
       - aws lambda update-function-code --function-name TicTacToeLambda --zip-file fileb://lambda_function.zip
+  post_build:
+    commands:
+      - aws s3 cp index.html s3://$WEBSITE_BUCKET/index.html
 artifacts:
   files:
     - lambda_function.zip
