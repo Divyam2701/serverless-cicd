@@ -32,21 +32,46 @@
       font-size: 20px;
       color: green;
     }
+    #api-url {
+      width: 400px;
+      font-size: 1em;
+      margin-bottom: 10px;
+    }
+    #output {
+      margin-top: 20px;
+      font-family: monospace;
+      color: #333;
+      background: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 10px;
+      display: inline-block;
+      text-align: left;
+      max-width: 600px;
+      word-break: break-all;
+    }
   </style>
 </head>
 <body>
 
   <h1>Tic Tac Toe</h1>
+  <input id="api-url" type="text" value="https://9e4miqjsj9.execute-api.us-west-1.amazonaws.com/dev/tictactoe" />
+  <button onclick="setApiUrl()">Set API URL</button>
   <div class="board" id="board"></div>
   <p id="status">Click a cell to make your move (X)</p>
+  <div id="output"></div>
 
   <script>
     let board = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
-
-    const apiUrl = "https://9e4miqjsj9.execute-api.us-west-1.amazonaws.com/dev/tictactoe";
+    let apiUrl = document.getElementById("api-url").value;
 
     const boardDiv = document.getElementById("board");
     const statusDiv = document.getElementById("status");
+    const outputDiv = document.getElementById("output");
+
+    function setApiUrl() {
+      apiUrl = document.getElementById("api-url").value;
+      statusDiv.textContent = "API URL set to: " + apiUrl;
+    }
 
     function renderBoard() {
       boardDiv.innerHTML = "";
@@ -80,16 +105,22 @@
 
         const data = await response.json();
 
+        // Show raw API response for debugging
+        outputDiv.textContent = JSON.stringify(data, null, 2);
+
         if (data.error) {
           statusDiv.textContent = data.error;
         } else {
           board = data.board;
           renderBoard();
-          statusDiv.textContent = "Your move was made.";
+          statusDiv.textContent = data.winner
+            ? (data.winner === "Draw" ? "It's a draw!" : `Player ${data.winner} wins!`)
+            : "Your move was made.";
         }
       } catch (err) {
         console.error(err);
         statusDiv.textContent = "Error contacting server.";
+        outputDiv.textContent = err.toString();
       }
     }
 
